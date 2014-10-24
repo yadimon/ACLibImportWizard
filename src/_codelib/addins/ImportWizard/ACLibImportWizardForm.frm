@@ -17,10 +17,10 @@ Begin Form
     Width =10215
     DatasheetFontHeight =11
     ItemSuffix =53
-    Left =7395
-    Top =1755
-    Right =17610
-    Bottom =9675
+    Left =9135
+    Top =2910
+    Right =19350
+    Bottom =10830
     OnUnload ="[Event Procedure]"
     RecSrcDt = Begin
         0x212b6fd80e9ce340
@@ -41,6 +41,7 @@ Begin Form
             FontName ="Calibri"
         End
         Begin Line
+            BorderLineStyle =0
             Width =1701
         End
         Begin CommandButton
@@ -53,21 +54,25 @@ Begin Form
         End
         Begin OptionButton
             SpecialEffect =2
+            BorderLineStyle =0
             LabelX =230
             LabelY =-30
         End
         Begin CheckBox
             SpecialEffect =2
+            BorderLineStyle =0
             LabelX =230
             LabelY =-30
         End
         Begin OptionGroup
             SpecialEffect =3
+            BorderLineStyle =0
             Width =1701
             Height =1701
         End
         Begin TextBox
             FELineBreak = NotDefault
+            BorderLineStyle =0
             Width =1701
             LabelX =-1701
             FontSize =11
@@ -75,6 +80,7 @@ Begin Form
             FontName ="Calibri"
         End
         Begin ListBox
+            BorderLineStyle =0
             Width =1701
             Height =1417
             LabelX =-1701

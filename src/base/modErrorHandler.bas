@@ -327,9 +327,9 @@ On Error Resume Next
    
    strVbProjectName = Access.VBE.ActiveVBProject.Name
    strDbFile = CurrentDb.Name 'Auf UNCPath verzichtet, damit dieses Modul unabhängig bleibt
-   If Access.VBE.ActiveVBProject.FileName <> strDbFile Then
+   If Access.VBE.ActiveVBProject.fileName <> strDbFile Then
       For Each vbp In Access.VBE.VBProjects
-         If vbp.FileName = strDbFile Then
+         If vbp.fileName = strDbFile Then
             strVbProjectName = vbp.Name
          End If
       Next

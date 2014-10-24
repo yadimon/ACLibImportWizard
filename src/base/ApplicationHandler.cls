@@ -219,7 +219,7 @@ End Sub
 ' </remarks>
 '**/
 '---------------------------------------------------------------------------------------
-Public Function Start(Optional ByRef ResumeMessage As Variant) As Boolean
+Public Function start(Optional ByRef ResumeMessage As Variant) As Boolean
    
    Dim currentStartFormName As String
    Dim eventResumeMode As ApplicationHandlerResumeModes
@@ -232,11 +232,11 @@ Public Function Start(Optional ByRef ResumeMessage As Variant) As Boolean
       Case ApplicationHandlerResumeModes.AppResumeMode_Cancel
          'Start abbrechen
          ResumeMessage = eventResumeMessage
-         Start = False
+         start = False
          Exit Function
       Case ApplicationHandlerResumeModes.AppResumeMode_Completed
          'Startprozedur wurde von Erweiterung übernommen
-         Start = eventResumeMessage
+         start = eventResumeMessage
          Exit Function
       Case ApplicationHandlerResumeModes.AppResumeMode_Error
          'Mit Fehlermeldung abbrechen
@@ -249,7 +249,7 @@ Public Function Start(Optional ByRef ResumeMessage As Variant) As Boolean
    'Update prüfen
    If checkVersionUpdate Then
       If Me.UpdateApplication Then
-         Start = False
+         start = False
          Application.Quit acQuitSaveNone
          Exit Function
       End If
@@ -281,7 +281,7 @@ Public Function Start(Optional ByRef ResumeMessage As Variant) As Boolean
    eventResumeMessage = Empty
    RaiseEvent AfterStartApplication(eventResumeMode, eventResumeMessage)
 
-   Start = True
+   start = True
 
 End Function
 
@@ -460,8 +460,8 @@ Public Property Get AppDb() As DAO.Database
    Set AppDb = m_AppDb
 End Property
 
-Friend Property Set AppDb(ByRef db As DAO.Database)
-   Set m_AppDb = db
+Friend Property Set AppDb(ByRef Db As DAO.Database)
+   Set m_AppDb = Db
 End Property
 
 Public Function GetTransferValue(Optional ByVal vValueIfNull As Variant = Null, Optional ByVal bolNoDel As Boolean = False) As Variant
@@ -541,20 +541,20 @@ End Sub
 
 Private Sub setAppDbProperty(ByVal propName As String, ByVal PropType As Long, ByVal PropValue As Variant)
    
-   Dim db As DAO.Database
+   Dim Db As DAO.Database
    Dim propCol As DAO.Properties
    
-   Set db = AppDb
-   Set propCol = db.Properties
+   Set Db = AppDb
+   Set propCol = Db.Properties
    If dbPropertyExists(propCol, propName) Then
       If Len(PropValue) = 0 Or IsNull(PropValue) Then
-         db.Properties.Delete propName
+         Db.Properties.Delete propName
       Else
-         db.Properties(propName) = PropValue
+         Db.Properties(propName) = PropValue
       End If
    Else
       If Len(PropValue) > 0 Then
-         db.Properties.Append db.CreateProperty(propName, PropType, PropValue)
+         Db.Properties.Append Db.CreateProperty(propName, PropType, PropValue)
       End If
    End If
 
@@ -562,11 +562,11 @@ End Sub
 
 Private Sub deleteAppDbProperty(ByVal sPropName As String)
    
-   Dim db As DAO.Database
+   Dim Db As DAO.Database
    Dim propCol As DAO.Properties
 
-   Set db = AppDb
-   Set propCol = db.Properties
+   Set Db = AppDb
+   Set propCol = Db.Properties
    
    If dbPropertyExists(propCol, sPropName) Then
       propCol.Delete sPropName

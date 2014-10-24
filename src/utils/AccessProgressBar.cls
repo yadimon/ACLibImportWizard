@@ -73,14 +73,14 @@ End Function
 ' </remarks>
 '**/                                            '<-- Ende Doxygen-Block
 '---------------------------------------------------------------------------------------
-Public Function Start() As Boolean
+Public Function start() As Boolean
     If Not m_IsInitialized Then
         m_IsInitialized = True
         m_ProgressBarCurrStep = 0
         m_Result = Access.Application.SysCmd(acSysCmdInitMeter, m_ProgressBarText, m_ProgressBarValueMax)
-        Start = True
+        start = True
     Else
-        Start = False
+        start = False
     End If
 End Function
 
@@ -102,7 +102,7 @@ End Function
 '---------------------------------------------------------------------------------------
 Public Function PerformStep(Optional ByVal ClearOnLastStep = True) As Long
     
-    If Not m_IsInitialized Then AccessProgressBar.Start
+    If Not m_IsInitialized Then AccessProgressBar.start
     
     If m_ProgressBarCurrStep < m_ProgressBarValueMax Then _
        m_ProgressBarCurrStep = m_ProgressBarCurrStep + m_ProgressBarStep

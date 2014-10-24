@@ -47,7 +47,7 @@ Public Function StartApplication(Optional ByRef param As Variant) As Boolean
 
 On Error GoTo HandleErr
 
-   StartApplication = CurrentApplication.Start
+   StartApplication = CurrentApplication.start
 
 ExitHere:
    Exit Function

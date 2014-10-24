@@ -135,7 +135,7 @@ End Property
 Public Function CreateAppFile(ByVal sFileID As String, ByVal sFileName As String) As Boolean
 
    Dim f As Integer
-   Dim Binfile() As Byte
+   Dim BinFile() As Byte
    Dim lngFieldSize As Long
    Dim rst As DAO.Recordset
    Dim fld As DAO.Field
@@ -148,13 +148,13 @@ Public Function CreateAppFile(ByVal sFileID As String, ByVal sFileName As String
       lngFieldSize = fld.FieldSize
       If lngFieldSize > 0 Then
 
-         ReDim Binfile(lngFieldSize - 1)
-         Binfile = fld.GetChunk(0, lngFieldSize)
+         ReDim BinFile(lngFieldSize - 1)
+         BinFile = fld.GetChunk(0, lngFieldSize)
 
         ' Datei erstellen
          f = FreeFile
          Open sFileName For Binary As #f
-         Put #f, , Binfile()
+         Put #f, , BinFile()
          Close #f
 
          CreateAppFile = True
@@ -180,11 +180,11 @@ End Function
 ' </remarks>
 '/
 '---------------------------------------------------------------------------------------
-Public Function SaveAppFile(ByVal FileId As String, ByVal FileName As String, _
+Public Function SaveAppFile(ByVal FileId As String, ByVal fileName As String, _
                    Optional ByVal SaveVersion As Boolean = False) As Boolean
 
    Dim f As Integer
-   Dim Binfile() As Byte
+   Dim BinFile() As Byte
    Dim ArraySize As Long
    Dim strVersion As String
    Dim FileInfo As WinApiFileInfo
@@ -192,11 +192,11 @@ Public Function SaveAppFile(ByVal FileId As String, ByVal FileName As String, _
 On Error GoTo HandleErr
 
    f = FreeFile
-   Open FileName For Binary As #f
+   Open fileName For Binary As #f
    ArraySize = LOF(f) - 1
    If ArraySize >= 0 Then
-      ReDim Binfile(ArraySize)
-      Get #f, , Binfile()
+      ReDim BinFile(ArraySize)
+      Get #f, , BinFile()
    End If
    Close #f
 
@@ -213,13 +213,13 @@ On Error GoTo HandleErr
    Else
       rst.Edit
    End If
-   rst.Fields("file").AppendChunk Binfile
+   rst.Fields("file").AppendChunk BinFile
    If SaveVersion Then
       Set FileInfo = New WinApiFileInfo
-      strVersion = FileInfo.GetFileVersion(FileName)
+      strVersion = FileInfo.GetFileVersion(fileName)
           Set FileInfo = Nothing
       If Len(strVersion) = 0 Then
-         strVersion = Format$(Nz(FileDateTime(FileName), vbNullString), "yyyy.mm.dd")
+         strVersion = Format$(Nz(FileDateTime(fileName), vbNullString), "yyyy.mm.dd")
       End If
       rst.Fields("version") = strVersion
    End If

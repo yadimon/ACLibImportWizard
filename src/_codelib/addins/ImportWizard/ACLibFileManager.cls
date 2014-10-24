@@ -229,18 +229,22 @@ End Sub
 Public Sub ExportAllForms()
 
    Dim ao As AccessObject
-
-   If checkDisallowExportFormReport() Then
-      Exit Sub
-   End If
+   Dim bUcs2UtfConvert As Boolean
+    'try to export
+   'If checkDisallowExportFormReport() Then
+   '   Exit Sub
+   'End If
 
    activateCurrentProject
    DoCmd.RunCommand acCmdCompileAndSaveAllModules
    
-   For Each ao In CurrentProject.AllForms
-      exportAccessObject AcObjectType.acForm, ao.Name
-   Next
+   'define if we need to convert the forms
+   bUcs2UtfConvert = AppCodeImportExport.InitUsingUcs2
    
+   For Each ao In CurrentProject.AllForms
+      exportAccessObject AcObjectType.acForm, ao.Name, bUcs2UtfConvert
+   Next
+
 #If DEBUGMODE Then
    Debug.Print "Formular-Export abgeschlossen"
 #End If
@@ -281,26 +285,26 @@ Public Sub ImportAllFilesFromRepository(Optional ByVal ImportMode As CodeLibImpo
 #If EARLYBINDING Then
    Dim checkFolder As Folder
    Dim tempFolder As Folder
-   Dim tempFile As file
+   Dim TempFile As file
 #Else
    Dim checkFolder As Object
    Dim tempFolder As Object
-   Dim tempFile As Object
+   Dim TempFile As Object
 #End If
    
    Set folderCol = New Collection
    Set m_ImportFileCollection = New Collection
    
-   Set tempFolder = fso.GetFolder(LocalRepositoryRootDirectory)
+   Set tempFolder = FSO.GetFolder(LocalRepositoryRootDirectory)
    folderCol.Add tempFolder, tempFolder.Path
    
    Do While folderCol.Count > 0
       
       Set checkFolder = folderCol(1)
       
-      For Each tempFile In checkFolder.Files
-         If Not ignoreFile(tempFile) Then
-            addMissingFile tempFile, ImportMode
+      For Each TempFile In checkFolder.Files
+         If Not ignoreFile(TempFile) Then
+            addMissingFile TempFile, ImportMode
          End If
       Next
       
@@ -313,7 +317,7 @@ Public Sub ImportAllFilesFromRepository(Optional ByVal ImportMode As CodeLibImpo
       folderCol.Remove 1
    
    Loop
-   Set tempFile = Nothing
+   Set TempFile = Nothing
    Set folderCol = Nothing
    
    importFilesFromImportCollection True, bImportTestFiles
@@ -328,10 +332,10 @@ Public Sub ImportRepositoryFile(ByVal RepositoryPath As String, _
 
    pathString = GetRepositoryFullPath(RepositoryPath)
    
-   Dim tempFile As Object
-   Set tempFile = fso.GetFile(pathString)
-   addMissingFile tempFile, ImportMode
-   Set tempFile = Nothing
+   Dim TempFile As Object
+   Set TempFile = FSO.GetFile(pathString)
+   addMissingFile TempFile, ImportMode
+   Set TempFile = Nothing
    
    importFilesFromImportCollection True, bImportTestFiles
 
@@ -344,15 +348,15 @@ Public Sub ImportRepositoryFiles(ByRef RepositoryPathArray() As String, _
    Dim ArraySize As Long
    Dim i As Long
    Dim pathString As String
-   Dim tempFile As Object
+   Dim TempFile As Object
 
    ArraySize = UBound(RepositoryPathArray)
    For i = LBound(RepositoryPathArray) To ArraySize - 1
       pathString = GetRepositoryFullPath(RepositoryPathArray(i))
-      Set tempFile = fso.GetFile(pathString)
-      addMissingFile tempFile, ImportMode
+      Set TempFile = FSO.GetFile(pathString)
+      addMissingFile TempFile, ImportMode
    Next
-   Set tempFile = Nothing
+   Set TempFile = Nothing
    
    importFilesFromImportCollection True, bImportTestFiles
 
@@ -362,7 +366,7 @@ Private Sub importFilesFromImportCollection( _
                                    Optional ByRef CompileAfterImport As Boolean = True, _
                                    Optional ByVal bImportTestFiles As Boolean = False)
    
-   Dim tempFile As Object
+   Dim TempFile As Object
    Dim fileImportMode As CodeLibImportMode
    Dim i As Long
    Dim maxCnt As Long
@@ -389,13 +393,13 @@ Private Sub importFilesFromImportCollection( _
     i = 1
     Do While i <= maxCnt
         colItem = m_ImportFileCollection(i)
-        Set tempFile = colItem(0)
+        Set TempFile = colItem(0)
         fileImportMode = colItem(1)
         
-        AccessProgressBar.Init "Importiere " & tempFile & "...", 2, 1
+        AccessProgressBar.Init "Importiere " & TempFile & "...", 2, 1
         AccessProgressBar.PerformStep
         
-        ImportFile tempFile, fileImportMode, bImportTestFiles
+        ImportFile TempFile, fileImportMode, bImportTestFiles
         
         AccessProgressBar.PerformStep
         maxCnt = m_ImportFileCollection.Count
@@ -480,10 +484,10 @@ Public Property Get CurrentVbProject() As Object
       Set m_CurrentVbProject = VBE.ActiveVBProject
       'Prüfen, ob das richtige VbProject gewählt wurde (muss das von CurrentDb sein)
       strCurrentDbName = UNCPath(CurrentDb.Name)
-      If m_CurrentVbProject.FileName <> strCurrentDbName Then
+      If m_CurrentVbProject.fileName <> strCurrentDbName Then
          Set m_CurrentVbProject = Nothing
          For Each proj In VBE.VBProjects
-            If proj.FileName = strCurrentDbName Then
+            If proj.fileName = strCurrentDbName Then
                Set m_CurrentVbProject = proj
                Exit For
             End If
@@ -522,16 +526,16 @@ Private Sub activateCurrentProject()
 End Sub
 
 #If EARLYBINDING Then
-Private Property Get fso() As FileSystemObject
+Private Property Get FSO() As FileSystemObject
 #Else
-Private Property Get fso() As Object
+Private Property Get FSO() As Object
 #End If
 
-   If fso Is Nothing Then
+   If FSO Is Nothing Then
       'Set fso = New FileSystemObject
       Set m_fso = CreateObject("Scripting.FileSystemObject")
    End If
-   Set fso = m_fso
+   Set FSO = m_fso
 
 End Property
 
@@ -555,7 +559,7 @@ End Property
 
 Private Sub addReplacedFilePath(ByVal repFilePath As String)
 
-   Dim tempFile As Object
+   Dim TempFile As Object
    Dim i As Long
    Dim maxCount As Long
    Dim col As Collection
@@ -564,33 +568,33 @@ Private Sub addReplacedFilePath(ByVal repFilePath As String)
    For i = 1 To maxCount
       'tempFile = varfileColItem(0) =>
       'varfilColItem = m_ImportFileCollection(i) =>
-      Set tempFile = m_ImportFileCollection(i)(0)
-      If tempFile.Path = repFilePath Then
-         m_ImportFileCollection.Remove tempFile.Path
+      Set TempFile = m_ImportFileCollection(i)(0)
+      If TempFile.Path = repFilePath Then
+         m_ImportFileCollection.Remove TempFile.Path
          Exit For
       End If
    Next
-   Set tempFile = Nothing
+   Set TempFile = Nothing
    
    Set col = CurrentReplacedFilesCollection
-   For Each tempFile In col
-      If tempFile.Path = repFilePath Then
+   For Each TempFile In col
+      If TempFile.Path = repFilePath Then
          Exit Sub
       End If
    Next
-   Set tempFile = Nothing
+   Set TempFile = Nothing
 
-   Set tempFile = fso.GetFile(repFilePath)
-   CurrentReplacedFilesCollection.Add tempFile, tempFile.Path
+   Set TempFile = FSO.GetFile(repFilePath)
+   CurrentReplacedFilesCollection.Add TempFile, TempFile.Path
 
 End Sub
 
 Private Function IsReplacedFile(ByRef RepFile As Object) As Boolean
 
-   Dim tempFile As Object
+   Dim TempFile As Object
 
-   For Each tempFile In CurrentReplacedFilesCollection
-      If tempFile.Path = RepFile.Path Then
+   For Each TempFile In CurrentReplacedFilesCollection
+      If TempFile.Path = RepFile.Path Then
          IsReplacedFile = True
          Exit Function
       End If
@@ -678,8 +682,8 @@ Private Sub ImportFile(ByRef ImportFile As Object, ByRef ImportMode As CodeLibIm
               Optional ByVal bImportTestFiles As Boolean = False)
    
    Dim i As Long
-   Dim tempFile As Object
-   Dim filePath As String
+   Dim TempFile As Object
+   Dim FilePath As String
    Dim cancelImport As Integer
 
    getCodeLibInfoFromFile m_cli, ImportFile, (ImportMode <> clim_ImportSelectedOnly)
@@ -696,19 +700,21 @@ Private Sub ImportFile(ByRef ImportFile As Object, ByRef ImportMode As CodeLibIm
    
    'Lizenz (LICENSE-Block)
    If Len(m_cli.LicenseFile) > 0 Then
-      filePath = GetRepositoryFullPath(m_cli.LicenseFile)
-      Set tempFile = fso.GetFile(filePath)
-      addMissingFile tempFile, clim_ImportMissingItems
+      FilePath = GetRepositoryFullPath(m_cli.LicenseFile)
+      If FSO.FileExists(FilePath) Then
+        Set TempFile = FSO.GetFile(FilePath)
+        addMissingFile TempFile, clim_ImportMissingItems
+      End If
    End If
 
    'Erforderliche Module (USE-Block)
    If ImportMode <> clim_ImportSelectedOnly Then
       If (0 / 1) + (Not Not m_cli.Dependency) Then
       For i = 0 To UBound(m_cli.Dependency)
-         filePath = GetRepositoryFullPath(m_cli.Dependency(i))
-         If fso.FileExists(filePath) Then
-            Set tempFile = fso.GetFile(filePath)
-            addMissingFile tempFile, ImportMode
+         FilePath = GetRepositoryFullPath(m_cli.Dependency(i))
+         If FSO.FileExists(FilePath) Then
+            Set TempFile = FSO.GetFile(FilePath)
+            addMissingFile TempFile, ImportMode
          End If
       Next
       End If
@@ -737,10 +743,10 @@ Private Sub ImportFile(ByRef ImportFile As Object, ByRef ImportMode As CodeLibIm
    If bImportTestFiles Then
    If (0 / 1) + (Not Not m_cli.TestFiles) Then
       For i = 0 To UBound(m_cli.TestFiles)
-         filePath = GetRepositoryFullPath(m_cli.TestFiles(i))
-         If fso.FileExists(filePath) Then
-            Set tempFile = fso.GetFile(filePath)
-            addMissingFile tempFile, ImportMode
+         FilePath = GetRepositoryFullPath(m_cli.TestFiles(i))
+         If FSO.FileExists(FilePath) Then
+            Set TempFile = FSO.GetFile(FilePath)
+            addMissingFile TempFile, ImportMode
          End If
       Next
    End If
@@ -783,7 +789,7 @@ End Sub
 Private Sub addMissingFile(ByVal UsedFile As Object, ByVal ImportMode As CodeLibImportMode)
    
    Dim varfilColItem As Variant
-   Dim tempFile As Object
+   Dim TempFile As Object
    Dim i As Long
    Dim maxCount As Long
 
@@ -793,8 +799,8 @@ Private Sub addMissingFile(ByVal UsedFile As Object, ByVal ImportMode As CodeLib
    For i = 1 To maxCount
       'tempFile = varfileColItem(0) =>
       'varfilColItem = m_ImportFileCollection(i) =>
-      Set tempFile = m_ImportFileCollection(i)(0)
-      If tempFile.Path = UsedFile.Path Then
+      Set TempFile = m_ImportFileCollection(i)(0)
+      If TempFile.Path = UsedFile.Path Then
          Exit Sub
       End If
    Next
@@ -805,20 +811,20 @@ Private Sub addMissingFile(ByVal UsedFile As Object, ByVal ImportMode As CodeLib
 End Sub
 
 
-Private Sub exportAccessObject(ByRef aoType As AcObjectType, ByRef aoName As String)
+Private Sub exportAccessObject(ByRef aoType As AcObjectType, ByRef aoName As String, Optional bUcs2UtfConvert As Boolean = False)
 
    Select Case aoType
       Case AcObjectType.acModule
          exportVbComponent aoName
       Case AcObjectType.acForm, AcObjectType.acReport
-         exportAccessObjectCli aoType, aoName
+         exportAccessObjectCli aoType, aoName, bUcs2UtfConvert
       Case Else
          '
    End Select
 
 End Sub
 
-Private Sub exportAccessObjectCli(ByRef aoType As AcObjectType, ByRef aoName As String)
+Private Sub exportAccessObjectCli(ByRef aoType As AcObjectType, ByRef aoName As String, Optional bUcs2UtfConvert As Boolean = False)
 
 '/**
 ' * @todo Was ist mit Formularen und Berichten ohne Modul?
@@ -829,9 +835,11 @@ Private Sub exportAccessObjectCli(ByRef aoType As AcObjectType, ByRef aoName As 
    getCodeLibInfoFromAccessObject cli, aoType, aoName
    If Len(cli.RepositoryFile) > 0 Then
       cli.LocalFile = GetRepositoryFullPath(cli.RepositoryFile)
-      createMissingFolder getParentFolderPath(cli.LocalFile)
-      Application.SaveAsText aoType, aoName, cli.LocalFile
+      createMissingFolder GetParentFolderPath(cli.LocalFile)
+      'Application.SaveAsText aoType, aoName, cli.LocalFile
+      AppCodeImportExport.ExportObject CLng(aoType), aoName, cli.LocalFile, bUcs2UtfConvert
       cleanAccessBugExport cli.LocalFile
+      AppCodeImportExport.SanitizeTextFile cli.LocalFile
    End If ' Rest ignorieren .. wenn im Code nicht steht, wird auch nicht exportiert
 
 #If DEBUGMODE Then
@@ -910,7 +918,7 @@ Private Sub exportVbComponent(ByRef vbcName As String)
    
    If Len(cli.RepositoryFile) > 0 Then
       cli.LocalFile = GetRepositoryFullPath(cli.RepositoryFile)
-      createMissingFolder getParentFolderPath(cli.LocalFile)
+      createMissingFolder GetParentFolderPath(cli.LocalFile)
       vbc.Export cli.LocalFile
    End If
    
@@ -1220,9 +1228,9 @@ Private Function CodeModuleExits(ByVal CodeModuleName As String) As Boolean
    
 End Function
 
-Public Function GetCodeLibInfoFromFilePath(ByVal filePath As String, Optional ByVal FindDependency As Boolean = True) As CodeLibInfo
+Public Function GetCodeLibInfoFromFilePath(ByVal FilePath As String, Optional ByVal FindDependency As Boolean = True) As CodeLibInfo
    Dim cli As CodeLibInfo
-   getCodeLibInfoFromFile cli, fso.GetFile(filePath), FindDependency
+   getCodeLibInfoFromFile cli, FSO.GetFile(FilePath), FindDependency
    GetCodeLibInfoFromFilePath = cli
 End Function
 
@@ -1454,16 +1462,16 @@ Private Sub createMissingFolder(ByRef FullPath As String)
    Dim TempPath As String
 
    If Len(Dir$(FullPath, vbDirectory)) = 0 Then
-      TempPath = getParentFolderPath(FullPath)
+      TempPath = GetParentFolderPath(FullPath)
       createMissingFolder TempPath
       MkDir FullPath
    End If
   
 End Sub
 
-Private Function getParentFolderPath(ByRef FullPath As String) As String
+Private Function GetParentFolderPath(ByRef FullPath As String) As String
 
-   getParentFolderPath = Left$(FullPath, InStrRev(FullPath, "\", , vbTextCompare) - 1)
+   GetParentFolderPath = Left$(FullPath, InStrRev(FullPath, "\", , vbTextCompare) - 1)
  
 End Function
 
@@ -1569,13 +1577,13 @@ End Sub
 Private Sub addAccessObjectToRefreshFileCollection(ByRef ao As AccessObject, ByRef ImportMode As CodeLibImportMode)
    
    Dim cli As CodeLibInfo
-   Dim tempFile As Object
+   Dim TempFile As Object
 
    getCodeLibInfoFromAccessObject cli, ao.Type, ao.Name
    If Len(cli.RepositoryFile) > 0 Then
       cli.LocalFile = GetRepositoryFullPath(cli.RepositoryFile)
-      Set tempFile = fso.GetFile(cli.LocalFile)
-      addMissingFile tempFile, ImportMode
+      Set TempFile = FSO.GetFile(cli.LocalFile)
+      addMissingFile TempFile, ImportMode
    End If
 
 End Sub

@@ -371,7 +371,7 @@ Public Function ProcedureUsed(ByRef cmp As CodeModuleProcedure) As Boolean
       With RegEx
          .Pattern = searchStringArray(i)
          .Global = False
-         bolUsed = .test(m_CodeModuleText)
+         bolUsed = .Test(m_CodeModuleText)
          If bolUsed Then
             Exit For
          End If
@@ -423,7 +423,7 @@ Public Function HeaderItemUsed(ByRef hdrItm As CodeModuleHeaderItem) As Boolean
       With RegEx
          .Pattern = searchStringArray(i)
          .Global = False
-         bolUsed = .test(m_CodeModuleText)
+         bolUsed = .Test(m_CodeModuleText)
          If bolUsed Then Exit For
       End With
 #Else
@@ -711,10 +711,10 @@ Private Property Get CurrentVbProject() As Object
       Set m_CurrentVbProject = VBE.ActiveVBProject
       'Prüfen, ob das richtige VbProject gewählt wurde (muss das von CurrentDb sein)
       strCurrentDbName = UNCPath(CurrentDb.Name)
-      If m_CurrentVbProject.FileName <> strCurrentDbName Then
+      If m_CurrentVbProject.fileName <> strCurrentDbName Then
          Set m_CurrentVbProject = Nothing
          For Each proj In VBE.VBProjects
-            If proj.FileName = strCurrentDbName Then
+            If proj.fileName = strCurrentDbName Then
                Set m_CurrentVbProject = proj
                Exit For
             End If

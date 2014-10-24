@@ -68,7 +68,7 @@ Public Function QueryDefExists(ByVal QueryDefName As String, _
    
 End Function
 
-Private Function CheckDatabaseObjectExists(ByVal ObjType As AcObjectType, ByVal ObjName As String, _
+Private Function CheckDatabaseObjectExists(ByVal objType As AcObjectType, ByVal ObjName As String, _
                       Optional ByVal dbs As DAO.Database = Nothing) As Boolean
 
    Dim rst As DAO.Recordset
@@ -81,7 +81,7 @@ Private Function CheckDatabaseObjectExists(ByVal ObjType As AcObjectType, ByVal 
 
    FilterString = "where Name = '" & Replace(ObjName, "'", "''") & "'"
 
-   Select Case ObjType
+   Select Case objType
       Case AcObjectType.acTable
          ObjectTypeFilterString = "Type IN (1, 4, 6)"
       Case AcObjectType.acQuery

@@ -923,22 +923,22 @@ End Function
 '---------------------------------------------------------------------------------------
 Public Function InsertIdentityReturn(ByVal InsertSQL As String) As Variant
 
-    Dim db As DAO.Database
+    Dim Db As DAO.Database
     Dim rst As DAO.Recordset
     Dim lngRecordsAffected As Long
 
 On Error GoTo HandleErr
 
-    Set db = Me.CurrentDb
-    db.Execute InsertSQL
-    lngRecordsAffected = db.RecordsAffected
+    Set Db = Me.CurrentDb
+    Db.Execute InsertSQL
+    lngRecordsAffected = Db.RecordsAffected
     
     If lngRecordsAffected = 0 Then
         InsertIdentityReturn = Null 'es wurde kein neuer DS angefügt
         Exit Function
     End If
 
-    Set rst = db.OpenRecordset("SELECT @@Identity") 'zuletzt zugewiesener Autowert ... funktioniert nicht mit MySQL-Tabellen!
+    Set rst = Db.OpenRecordset("SELECT @@Identity") 'zuletzt zugewiesener Autowert ... funktioniert nicht mit MySQL-Tabellen!
     With rst
         If .EOF Then
             InsertIdentityReturn = Null

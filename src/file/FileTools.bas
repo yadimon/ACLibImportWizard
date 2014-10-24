@@ -426,20 +426,20 @@ Public Function ConvertStringToFileName(ByVal Text As String, _
                                    Optional ByVal CharsToReplace As String = "/':()", _
                                    Optional ByVal CharsToDelete As String = "?*""") As String
 
-   Dim FileName As String
+   Dim fileName As String
    Dim i As Long
    
-   FileName = Trim$(Text)
+   fileName = Trim$(Text)
    
    For i = 1 To Len(CharsToDelete)
-      FileName = Replace(FileName, Mid(CharsToReplace, i, 1), vbNullString)
+      fileName = Replace(fileName, Mid(CharsToReplace, i, 1), vbNullString)
    Next
    
    For i = 1 To Len(CharsToReplace)
-      FileName = Replace(FileName, Mid(CharsToReplace, i, 1), ReplaceWith)
+      fileName = Replace(fileName, Mid(CharsToReplace, i, 1), ReplaceWith)
    Next
    
-   ConvertStringToFileName = FileName
+   ConvertStringToFileName = fileName
 
 End Function
 
@@ -642,7 +642,7 @@ Public Function ExtractFromZipFile(ByVal ZipFile As String, ByVal Destination As
 
    With CreateObject("Shell.Application")
       .Namespace(Destination & "").CopyHere .Namespace(ZipFile & "").Items
-      ExtractFromZipFile = .Namespace(ZipFile & "").Items.Item(0).Name
+      ExtractFromZipFile = .Namespace(ZipFile & "").Items.item(0).Name
    End With
 
 End Function
@@ -696,6 +696,6 @@ End Function
 ' </remarks>
 '**/
 '---------------------------------------------------------------------------------------
-Public Function GetFileExtension(ByVal filePath As String) As String
-    GetFileExtension = VBA.Strings.Mid$(filePath, VBA.Strings.InStrRev(filePath, "."))
+Public Function GetFileExtension(ByVal FilePath As String) As String
+    GetFileExtension = VBA.Strings.Mid$(FilePath, VBA.Strings.InStrRev(FilePath, "."))
 End Function

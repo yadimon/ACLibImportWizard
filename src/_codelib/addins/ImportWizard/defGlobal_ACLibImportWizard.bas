@@ -187,12 +187,16 @@ HandleErr:
    End Select
 End Function
 
-Public Function ExportAllCodeLibElements() As Variant
+Public Function ExportAllCodeLibElements(Optional bMsgBox As Boolean = True) As Variant
 
 On Error GoTo HandleErr
 
    CurrentACLibFileManager.ExportAll
-   MsgBox "Export abgeschlossen", vbInformation
+   If bMsgBox Then
+      MsgBox "Export abgeschlossen", vbInformation
+   Else
+      Debug.Print "Export abgeschlossen"
+   End If
 
 ExitHere:
 On Error Resume Next

@@ -52,7 +52,7 @@ End Enum
          
 #If VBA7 Then
 
-Private Declare PtrSafe Function GetTempPath Lib "kernel32" Alias "GetTempPathA" ( _
+Private Declare PtrSafe Function getTempPath Lib "kernel32" Alias "GetTempPathA" ( _
          ByVal nBufferLength As Long, _
          ByVal lpBuffer As String) As Long
 
@@ -64,7 +64,7 @@ Private Declare PtrSafe Function API_GetTempFilename Lib "kernel32" Alias "GetTe
 
 #Else
 
-Private Declare Function GetTempPath Lib "kernel32" Alias "GetTempPathA" ( _
+Private Declare Function getTempPath Lib "kernel32" Alias "GetTempPathA" ( _
          ByVal nBufferLength As Long, _
          ByVal lpBuffer As String) As Long
 
@@ -209,8 +209,8 @@ End Property
 ' <remarks></remarks>
 '**/
 '---------------------------------------------------------------------------------------
-Public Property Set ClientDatabase(ByRef db As DAO.Database)
-   Set m_ClientDatabase = db
+Public Property Set ClientDatabase(ByRef Db As DAO.Database)
+   Set m_ClientDatabase = Db
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -506,7 +506,7 @@ End Function
 Public Sub DropLinkedTableDefs()
 
    Dim strFile As String
-   Dim db As DAO.Database
+   Dim Db As DAO.Database
    Dim tdf As DAO.TableDef
    Dim tdfCnt As Long, i As Long
 
@@ -519,8 +519,8 @@ Public Sub DropLinkedTableDefs()
    
    If Len(strFile) = 0 Then Exit Sub
    
-   Set db = ClientDatabase
-   With db
+   Set Db = ClientDatabase
+   With Db
       tdfCnt = .TableDefs.Count
       For i = (tdfCnt - 1) To 0 Step -1
          Set tdf = .TableDefs(i)
@@ -546,15 +546,15 @@ End Sub
 '---------------------------------------------------------------------------------------
 Public Property Get LinkedTableDefExists(ByVal TableDefName As String) As Boolean
    
-   Dim db As DAO.Database
+   Dim Db As DAO.Database
    Dim tdf As DAO.TableDef
    
-   Set db = ClientDatabase
-   db.TableDefs.Refresh 'zur Sicherheit, falls im FE Tab gelöscht wurde
+   Set Db = ClientDatabase
+   Db.TableDefs.Refresh 'zur Sicherheit, falls im FE Tab gelöscht wurde
    
    LinkedTableDefExists = False
    
-   For Each tdf In db.TableDefs
+   For Each tdf In Db.TableDefs
       If tdf.Name = TableDefName Then
          LinkedTableDefExists = True
          Exit For
@@ -657,7 +657,7 @@ Private Function getTempFileName(Optional ByRef sTempPath As String = "", _
 
    If Len(sTempPath) = 0 Then
       strTempFileName = String$(m_conMaxPathLen, 0)
-      lngRet = GetTempPath(m_conMaxPathLen, strTempFileName)
+      lngRet = getTempPath(m_conMaxPathLen, strTempFileName)
       strTempFileName = Left$(strTempFileName, InStr(strTempFileName, Chr$(0)) - 1)
       strTempPath = strTempFileName
    Else
