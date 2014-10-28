@@ -734,13 +734,16 @@ On Error GoTo HandleErr
       Case 32
          CurrentACLibFileManager.ExportAllModules
       Case Else
-         '
+         GoTo ExitHere
    End Select
    
-   Set mnu = Nothing
+   MsgBox "Fertig"
+   
+   
 
 ExitHere:
 On Error Resume Next
+   Set mnu = Nothing
    Exit Function
 
 HandleErr:
