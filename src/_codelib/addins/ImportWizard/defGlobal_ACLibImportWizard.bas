@@ -226,7 +226,7 @@ On Error Resume Next
    Exit Function
 
 HandleErr:
-   Select Case HandleError(Err.Number, "ExportAllCodeLibElements", Err.Description, ACLibErrorHandlerMode.aclibErrMsgBox)
+   Select Case HandleError(Err.Number, "ExportAllCodeLibModules", Err.Description, ACLibErrorHandlerMode.aclibErrMsgBox)
    Case ACLibErrorResumeMode.aclibErrResume
       Resume
    Case ACLibErrorResumeMode.aclibErrResumeNext
